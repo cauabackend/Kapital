@@ -11,7 +11,8 @@ import {
   Wallet,
   ReceiptText,
   LogOut,
-  ChevronLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -20,7 +21,7 @@ const navItems = [
   { href: "/transactions", label: "Transactions", icon: ArrowLeftRight },
   { href: "/budgets", label: "Budgets", icon: Wallet },
   { href: "/pots", label: "Pots", icon: PiggyBank },
-  { href: "/recurring-bills", label: "Recurring Bills", icon: ReceiptText },
+  { href: "/recurring-bills", label: "Bills", icon: ReceiptText },
 ];
 
 export function Sidebar() {
@@ -38,26 +39,43 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-sidebar border-sidebar-border flex h-screen flex-col border-r transition-all duration-300",
-        collapsed ? "w-[72px]" : "w-[260px]"
+        "relative flex h-screen flex-col border-r border-border/50 bg-card transition-all duration-300 ease-in-out",
+        collapsed ? "w-[68px]" : "w-[240px]"
       )}
     >
+      {/* Grain overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.15]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E")`,
+        }}
+      />
+
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-5">
-        <div className="bg-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
-          <span className="text-primary-foreground font-heading text-sm font-bold">
+      <div className="relative flex h-[72px] items-center gap-3 px-5">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary shadow-[0_0_20px_hsl(42_70%_60%_/_0.15)]">
+          <span className="font-heading text-base font-bold text-primary-foreground">
             K
           </span>
         </div>
         {!collapsed && (
-          <span className="font-heading text-sidebar-foreground text-xl font-semibold tracking-tight">
+          <span className="font-heading text-lg font-semibold tracking-tight text-foreground animate-[fadeSlideIn_0.3s_ease-out_both]">
             Kapital
           </span>
         )}
       </div>
 
+      {/* Section label */}
+      {!collapsed && (
+        <div className="relative px-5 pb-2 pt-4">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/50">
+            Menu
+          </span>
+        </div>
+      )}
+
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 pt-4">
+      <nav className="relative flex-1 space-y-0.5 px-3 pt-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -65,40 +83,51 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+                "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-200",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-primary"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
             >
-              <item.icon className="h-5 w-5 shrink-0" />
+              {/* Active indicator bar */}
+              {isActive && (
+                <div className="absolute -left-3 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
+              )}
+              <item.icon
+                className={cn(
+                  "h-[18px] w-[18px] shrink-0 transition-colors",
+                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                )}
+                strokeWidth={isActive ? 2.2 : 1.8}
+              />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom actions */}
-      <div className="space-y-1 border-t border-sidebar-border px-3 py-3">
+      {/* Bottom */}
+      <div className="relative space-y-0.5 border-t border-border/50 px-3 py-3">
         <button
           onClick={handleSignOut}
-          className="text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors"
+          className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground transition-all duration-200 hover:bg-destructive/10 hover:text-destructive"
         >
-          <LogOut className="h-5 w-5 shrink-0" />
+          <LogOut className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
           {!collapsed && <span>Sign out</span>}
         </button>
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground transition-all duration-200 hover:bg-muted/50 hover:text-foreground"
         >
-          <ChevronLeft
-            className={cn(
-              "h-5 w-5 shrink-0 transition-transform",
-              collapsed && "rotate-180"
-            )}
-          />
-          {!collapsed && <span>Collapse</span>}
+          {collapsed ? (
+            <PanelLeftOpen className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
+          ) : (
+            <>
+              <PanelLeftClose className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} />
+              <span>Collapse</span>
+            </>
+          )}
         </button>
       </div>
     </aside>
