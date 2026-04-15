@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -35,64 +35,88 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="space-y-2 text-center">
-          <h1 className="font-heading text-4xl font-semibold tracking-tight">
-            Kapital
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Sign in to manage your finances
-          </p>
+    <div className="space-y-10 animate-[fadeSlideIn_0.6s_ease-out_both]">
+      {/* Mobile logo — only shows on small screens */}
+      <div className="flex items-center gap-3 lg:hidden">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
+          <span className="font-heading text-base font-bold text-primary-foreground">K</span>
         </div>
+        <span className="font-heading text-lg font-semibold tracking-tight">Kapital</span>
+      </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            />
-          </div>
-
-          {error && (
-            <p className="text-destructive text-sm">{error}</p>
-          )}
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
-          </Button>
-        </form>
-
-        <p className="text-muted-foreground text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-primary underline underline-offset-4 hover:opacity-80">
-            Sign up
-          </Link>
+      <div className="space-y-2">
+        <h1 className="font-heading text-3xl font-semibold tracking-tight">
+          Welcome back
+        </h1>
+        <p className="text-muted-foreground">
+          Sign in to your account to continue
         </p>
       </div>
+
+      <form onSubmit={handleLogin} className="space-y-5">
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            required
+            autoComplete="email"
+            className="w-full border-b border-border bg-transparent pb-3 pt-1 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+            autoComplete="current-password"
+            className="w-full border-b border-border bg-transparent pb-3 pt-1 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary"
+          />
+        </div>
+
+        {error && (
+          <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3">
+            <p className="text-sm text-destructive">{error}</p>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="group flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+        >
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              Sign in
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </>
+          )}
+        </button>
+      </form>
+
+      <p className="text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/signup"
+          className="font-medium text-foreground underline underline-offset-4 transition-colors hover:text-primary"
+        >
+          Create one
+        </Link>
+      </p>
     </div>
   );
 }
