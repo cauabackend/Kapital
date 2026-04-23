@@ -61,6 +61,9 @@ export async function fetchBudgets(): Promise<BudgetWithData[]> {
 export async function createBudget(formData: FormData) {
   const supabase = await createClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Usuário não autenticado." };
+
   const raw = {
     category: formData.get("category") as string,
     max_amount: Number(formData.get("max_amount")),
@@ -71,7 +74,7 @@ export async function createBudget(formData: FormData) {
     return { error: parsed.error.issues[0].message };
   }
 
-  const { error } = await supabase.from("budgets").insert(parsed.data);
+  const { error } = await supabase.from("budgets").insert({ ...parsed.data, user_id: user.id });
   if (error) return { error: error.message };
 
   revalidatePath("/budgets");

@@ -13,10 +13,13 @@ import {
   X,
   Check,
   ChevronDown,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TransactionsResult, SortField, SortOrder, FilterType } from "./actions";
+import { TransactionsResult, SortField, SortOrder, FilterType, deleteTransaction } from "./actions";
 import { useT } from "@/hooks/use-t";
+import { TransactionModal } from "./transaction-modal";
 
 function formatAmount(amount: number, type: string) {
   const formatted = new Intl.NumberFormat("en-US", {
@@ -37,14 +40,27 @@ function formatDate(dateStr: string) {
 // Skeleton row
 function SkeletonRow() {
   return (
-    <div className="grid grid-cols-[1fr_130px_110px_110px] items-center gap-4 border-b border-border/30 px-5 py-4 last:border-0">
-      <div className="flex items-center gap-3">
-        <div className="h-8 w-8 animate-pulse rounded-lg bg-muted/50" />
-        <div className="h-4 w-40 animate-pulse rounded bg-muted/50" />
+    <div className="border-b border-border/30 last:border-0">
+      {/* Mobile skeleton */}
+      <div className="flex items-center gap-3 px-4 py-3.5 md:hidden">
+        <div className="h-9 w-9 animate-pulse rounded-lg bg-muted/50 shrink-0" />
+        <div className="flex-1 space-y-1.5">
+          <div className="h-4 w-36 animate-pulse rounded bg-muted/50" />
+          <div className="h-3 w-24 animate-pulse rounded bg-muted/50" />
+        </div>
+        <div className="h-4 w-16 animate-pulse rounded bg-muted/50 shrink-0" />
       </div>
-      <div className="h-5 w-20 animate-pulse rounded-full bg-muted/50" />
-      <div className="h-4 w-24 animate-pulse rounded bg-muted/50" />
-      <div className="ml-auto h-4 w-16 animate-pulse rounded bg-muted/50" />
+      {/* Desktop skeleton */}
+      <div className="hidden md:grid grid-cols-[1fr_130px_110px_110px_36px] items-center gap-4 px-5 py-4">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 animate-pulse rounded-lg bg-muted/50" />
+          <div className="h-4 w-40 animate-pulse rounded bg-muted/50" />
+        </div>
+        <div className="h-5 w-20 animate-pulse rounded-full bg-muted/50" />
+        <div className="h-4 w-24 animate-pulse rounded bg-muted/50" />
+        <div className="ml-auto h-4 w-16 animate-pulse rounded bg-muted/50" />
+        <div />
+      </div>
     </div>
   );
 }
@@ -74,6 +90,8 @@ export function TransactionsTable({
   const [searchInput, setSearchInput] = useState(search);
   const [showSort, setShowSort] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const sortRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
   const searchTimer = useRef<NodeJS.Timeout | null>(null);
@@ -140,7 +158,18 @@ export function TransactionsTable({
   const { data, total, totalPages } = initialData;
   const hasActiveFilters = filterType !== "all" || categoryFilter !== "";
 
+  const handleDelete = (id: string) => {
+    setDeletingId(id);
+    startTransition(async () => {
+      await deleteTransaction(id);
+      setDeletingId(null);
+    });
+  };
+
   return (
+    <>
+      <TransactionModal open={showModal} onClose={() => setShowModal(false)} />
+
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
@@ -341,6 +370,15 @@ export function TransactionsTable({
             </div>
           )}
         </div>
+
+        {/* Add Transaction button */}
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.98]"
+        >
+          <Plus className="h-4 w-4" strokeWidth={2} />
+          <span className="hidden sm:inline">{t.transactions.addTransaction}</span>
+        </button>
       </div>
 
       {/* Results info */}
@@ -364,8 +402,8 @@ export function TransactionsTable({
           isPending && "opacity-60",
         )}
       >
-        {/* Header */}
-        <div className="grid grid-cols-[1fr_130px_110px_110px] items-center gap-4 border-b border-border/50 px-5 py-3">
+        {/* Header — hidden on mobile */}
+        <div className="hidden md:grid grid-cols-[1fr_130px_110px_110px_36px] items-center gap-4 border-b border-border/50 px-5 py-3">
           <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/50">
             {t.transactions.description}
           </span>
@@ -378,6 +416,7 @@ export function TransactionsTable({
           <span className="text-right text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground/50">
             {t.transactions.amount}
           </span>
+          <span />
         </div>
 
         {/* Rows */}
@@ -396,12 +435,9 @@ export function TransactionsTable({
           </div>
         ) : (
           data.map((tx) => (
-            <div
-              key={tx.id}
-              className="grid grid-cols-[1fr_130px_110px_110px] items-center gap-4 border-b border-border/30 px-5 py-4 transition-colors last:border-0 hover:bg-muted/20"
-            >
-              {/* Description + icon */}
-              <div className="flex min-w-0 items-center gap-3">
+            <div key={tx.id} className="border-b border-border/30 last:border-0">
+              {/* Mobile layout */}
+              <div className="flex items-center gap-3 px-4 py-3.5 md:hidden">
                 <div
                   className={cn(
                     "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
@@ -409,41 +445,73 @@ export function TransactionsTable({
                   )}
                 >
                   {tx.type === "income" ? (
-                    <TrendingUp
-                      className="h-4 w-4 text-income"
-                      strokeWidth={1.8}
-                    />
+                    <TrendingUp className="h-4 w-4 text-income" strokeWidth={1.8} />
                   ) : (
-                    <TrendingDown
-                      className="h-4 w-4 text-muted-foreground"
-                      strokeWidth={1.8}
-                    />
+                    <TrendingDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />
                   )}
                 </div>
-                <span className="truncate text-sm font-medium">
-                  {tx.description}
-                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{tx.description}</p>
+                  <p className="text-[11px] text-muted-foreground/60">
+                    {tx.category} · {formatDate(tx.date)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    className={cn(
+                      "text-sm font-semibold tabular-nums",
+                      tx.type === "income" ? "text-income" : "text-foreground",
+                    )}
+                  >
+                    {formatAmount(tx.amount, tx.type)}
+                  </span>
+                  <button
+                    onClick={() => handleDelete(tx.id)}
+                    disabled={deletingId === tx.id}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground/30 transition-colors hover:bg-expense/10 hover:text-expense disabled:opacity-30"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" strokeWidth={1.8} />
+                  </button>
+                </div>
               </div>
 
-              {/* Category badge */}
-              <span className="inline-flex w-fit items-center rounded-full border border-border/50 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                {tx.category}
-              </span>
-
-              {/* Date */}
-              <span className="text-sm text-muted-foreground">
-                {formatDate(tx.date)}
-              </span>
-
-              {/* Amount */}
-              <span
-                className={cn(
-                  "text-right text-sm font-semibold tabular-nums",
-                  tx.type === "income" ? "text-income" : "text-foreground",
-                )}
-              >
-                {formatAmount(tx.amount, tx.type)}
-              </span>
+              {/* Desktop layout */}
+              <div className="hidden md:grid grid-cols-[1fr_130px_110px_110px_36px] items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/20">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                      tx.type === "income" ? "bg-income/10" : "bg-muted/50",
+                    )}
+                  >
+                    {tx.type === "income" ? (
+                      <TrendingUp className="h-4 w-4 text-income" strokeWidth={1.8} />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />
+                    )}
+                  </div>
+                  <span className="truncate text-sm font-medium">{tx.description}</span>
+                </div>
+                <span className="inline-flex w-fit items-center rounded-full border border-border/50 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                  {tx.category}
+                </span>
+                <span className="text-sm text-muted-foreground">{formatDate(tx.date)}</span>
+                <span
+                  className={cn(
+                    "text-right text-sm font-semibold tabular-nums",
+                    tx.type === "income" ? "text-income" : "text-foreground",
+                  )}
+                >
+                  {formatAmount(tx.amount, tx.type)}
+                </span>
+                <button
+                  onClick={() => handleDelete(tx.id)}
+                  disabled={deletingId === tx.id}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground/30 transition-colors hover:bg-expense/10 hover:text-expense disabled:opacity-30"
+                >
+                  <Trash2 className="h-3.5 w-3.5" strokeWidth={1.8} />
+                </button>
+              </div>
             </div>
           ))
         )}
@@ -510,5 +578,6 @@ export function TransactionsTable({
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -204,8 +204,8 @@ export function BillsClient({ bills }: BillsClientProps) {
 
       {/* Bills list */}
       <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
-        {/* Column headers */}
-        <div className="grid grid-cols-[56px_1fr_100px_96px_80px] items-center gap-4 border-b border-border/40 px-5 py-3">
+        {/* Column headers — hidden on mobile */}
+        <div className="hidden md:grid grid-cols-[56px_1fr_100px_96px_80px] items-center gap-4 border-b border-border/40 px-5 py-3">
           <button
             onClick={() => cycleSort("due_day")}
             className="text-left text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 hover:text-muted-foreground transition-colors"
@@ -336,70 +336,82 @@ function BillRow({
 
   const sc = statusConfig[status];
 
+  const amountFmt = bill.amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  });
+
   return (
-    <div
-      className="group grid grid-cols-[56px_1fr_100px_96px_80px] items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/20"
-      style={{ animation: `fadeSlideIn 0.35s ease-out ${index * 0.04}s both` }}
-    >
-      {/* Day chip */}
-      <div
-        className={cn(
-          "flex h-10 w-10 flex-col items-center justify-center rounded-xl text-center transition-colors",
-          dayColors[status],
-        )}
-      >
-        <span className="font-heading text-base font-bold leading-none tabular-nums">
-          {bill.due_day}
-        </span>
-        <span className="text-[9px] font-semibold uppercase tracking-wide opacity-70">
-          {ordinal(bill.due_day).slice(-2)}
-        </span>
+    <div style={{ animation: `fadeSlideIn 0.35s ease-out ${index * 0.04}s both` }}>
+      {/* Mobile layout */}
+      <div className="flex items-center gap-3 px-4 py-3.5 md:hidden">
+        <div
+          className={cn(
+            "flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl text-center",
+            dayColors[status],
+          )}
+        >
+          <span className="font-heading text-base font-bold leading-none tabular-nums">{bill.due_day}</span>
+          <span className="text-[9px] font-semibold uppercase tracking-wide opacity-70">{ordinal(bill.due_day).slice(-2)}</span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-medium leading-snug">{bill.name}</p>
+          <p className="text-xs text-muted-foreground/60">{bill.category}</p>
+        </div>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <span className="font-heading text-sm font-semibold tabular-nums">{amountFmt}</span>
+          <button
+            onClick={onToggle}
+            disabled={isToggling}
+            className={cn(
+              "flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-all",
+              "hover:brightness-110 active:scale-[0.97] disabled:opacity-60",
+              sc.cls,
+            )}
+          >
+            {sc.icon}
+            {sc.label}
+          </button>
+        </div>
+        <div className="flex shrink-0 flex-col gap-1">
+          <button onClick={onEdit} className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={onDelete} className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[hsl(var(--expense)/0.1)] hover:text-[hsl(var(--expense))]">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
-      {/* Name + category */}
-      <div className="min-w-0">
-        <p className="truncate font-medium leading-snug">{bill.name}</p>
-        <p className="text-xs text-muted-foreground/60">{bill.category}</p>
-      </div>
-
-      {/* Status toggle pill */}
-      <button
-        onClick={onToggle}
-        disabled={isToggling}
-        className={cn(
-          "flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all",
-          "hover:brightness-110 active:scale-[0.97] disabled:opacity-60",
-          sc.cls,
-        )}
-        title={status === "paid" ? "Mark as unpaid" : "Mark as paid"}
-      >
-        {sc.icon}
-        {sc.label}
-      </button>
-
-      {/* Amount */}
-      <p className="text-right font-heading text-sm font-semibold tabular-nums">
-        {bill.amount.toLocaleString("en-US", {
-          style: "currency",
-          currency: "USD",
-          minimumFractionDigits: 2,
-        })}
-      </p>
-
-      {/* Edit / delete — hover reveal */}
-      <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+      {/* Desktop layout */}
+      <div className="group hidden md:grid grid-cols-[56px_1fr_100px_96px_80px] items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/20">
+        <div className={cn("flex h-10 w-10 flex-col items-center justify-center rounded-xl text-center transition-colors", dayColors[status])}>
+          <span className="font-heading text-base font-bold leading-none tabular-nums">{bill.due_day}</span>
+          <span className="text-[9px] font-semibold uppercase tracking-wide opacity-70">{ordinal(bill.due_day).slice(-2)}</span>
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-medium leading-snug">{bill.name}</p>
+          <p className="text-xs text-muted-foreground/60">{bill.category}</p>
+        </div>
         <button
-          onClick={onEdit}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          onClick={onToggle}
+          disabled={isToggling}
+          className={cn("flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all", "hover:brightness-110 active:scale-[0.97] disabled:opacity-60", sc.cls)}
+          title={status === "paid" ? "Mark as unpaid" : "Mark as paid"}
         >
-          <Pencil className="h-3.5 w-3.5" />
+          {sc.icon}
+          {sc.label}
         </button>
-        <button
-          onClick={onDelete}
-          className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[hsl(var(--expense)/0.1)] hover:text-[hsl(var(--expense))]"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
+        <p className="text-right font-heading text-sm font-semibold tabular-nums">{amountFmt}</p>
+        <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <button onClick={onEdit} className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={onDelete} className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-[hsl(var(--expense)/0.1)] hover:text-[hsl(var(--expense))]">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );

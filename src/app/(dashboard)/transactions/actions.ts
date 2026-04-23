@@ -1,7 +1,9 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { Transaction } from "@/types/database";
+import { transactionSchema } from "@/lib/validators/transaction";
 
 export type SortField = "date" | "amount" | "description" | "category";
 export type SortOrder = "asc" | "desc";
@@ -74,6 +76,45 @@ export async function fetchTransactions({
     pageSize,
     totalPages: Math.ceil(total / pageSize),
   };
+}
+
+export async function createTransaction(formData: FormData) {
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Usuário não autenticado." };
+
+  const raw = {
+    description: formData.get("description") as string,
+    amount: Number(formData.get("amount")),
+    category: formData.get("category") as string,
+    date: formData.get("date") as string,
+    type: formData.get("type") as string,
+  };
+
+  const parsed = transactionSchema.safeParse(raw);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const { error } = await supabase
+    .from("transactions")
+    .insert({ ...parsed.data, user_id: user.id });
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/transactions");
+  revalidatePath("/overview");
+  return { success: true };
+}
+
+export async function deleteTransaction(id: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("transactions").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/transactions");
+  revalidatePath("/overview");
+  return { success: true };
 }
 
 export async function fetchTransactionCategories(): Promise<string[]> {

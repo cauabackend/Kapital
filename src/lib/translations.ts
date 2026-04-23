@@ -83,6 +83,10 @@ export const translations = {
       amountLowest: "Amount (lowest)",
       descAZ: "Description (A–Z)",
       descZA: "Description (Z–A)",
+      addTransaction: "Add Transaction",
+      createTransaction: "Add transaction",
+      deleteTitle: "Delete transaction?",
+      deleteBody: "This transaction will be permanently removed.",
     },
     budgets: {
       title: "Budgets",
@@ -241,6 +245,10 @@ export const translations = {
       amountLowest: "Valor (menor)",
       descAZ: "Descrição (A–Z)",
       descZA: "Descrição (Z–A)",
+      addTransaction: "Nova Transação",
+      createTransaction: "Adicionar transação",
+      deleteTitle: "Excluir transação?",
+      deleteBody: "Esta transação será removida permanentemente.",
     },
     budgets: {
       title: "Orçamentos",

@@ -20,6 +20,9 @@ export async function fetchPots(): Promise<Pot[]> {
 export async function createPot(formData: FormData) {
   const supabase = await createClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Usuário não autenticado." };
+
   const raw = {
     name: formData.get("name") as string,
     target_amount: Number(formData.get("target_amount")),
@@ -31,7 +34,7 @@ export async function createPot(formData: FormData) {
 
   const { error } = await supabase
     .from("pots")
-    .insert({ ...parsed.data, current_amount: 0 });
+    .insert({ ...parsed.data, current_amount: 0, user_id: user.id });
 
   if (error) return { error: error.message };
 

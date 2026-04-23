@@ -20,6 +20,9 @@ export async function fetchRecurringBills(): Promise<RecurringBill[]> {
 export async function createRecurringBill(formData: FormData) {
   const supabase = await createClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Usuário não autenticado." };
+
   const raw = {
     name: formData.get("name") as string,
     amount: Number(formData.get("amount")),
@@ -32,7 +35,7 @@ export async function createRecurringBill(formData: FormData) {
 
   const { error } = await supabase
     .from("recurring_bills")
-    .insert({ ...parsed.data, is_paid: false });
+    .insert({ ...parsed.data, is_paid: false, user_id: user.id });
 
   if (error) return { error: error.message };
 
