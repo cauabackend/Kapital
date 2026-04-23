@@ -1,6 +1,13 @@
 import { Suspense } from "react";
-import { fetchTransactions, fetchTransactionCategories, SortField, SortOrder, FilterType } from "./actions";
+import {
+  fetchTransactions,
+  fetchTransactionCategories,
+  SortField,
+  SortOrder,
+  FilterType,
+} from "./actions";
 import { TransactionsTable } from "./transactions-table";
+import { TransactionsHeader } from "./transactions-header";
 import TransactionsLoading from "./loading";
 
 interface PageProps {
@@ -33,15 +40,7 @@ async function TransactionsContent({ searchParams }: PageProps) {
 export default function TransactionsPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-8 animate-[fadeSlideIn_0.5s_ease-out_both]">
-      {/* Header */}
-      <div className="space-y-1">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">
-          Transactions
-        </h1>
-        <p className="text-muted-foreground">
-          Track every movement of your money
-        </p>
-      </div>
+      <TransactionsHeader />
 
       <Suspense fallback={<TransactionsLoading />}>
         <TransactionsContent searchParams={searchParams} />

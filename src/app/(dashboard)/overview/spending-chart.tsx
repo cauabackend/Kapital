@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { MonthlyChartPoint } from "./actions";
+import { useT } from "@/hooks/use-t";
 
 // Recharts v3 tooltip payload shape
 interface TooltipEntry {
@@ -64,6 +65,7 @@ interface SpendingChartProps {
 }
 
 export function SpendingChart({ data }: SpendingChartProps) {
+  const t = useT();
   return (
     <ResponsiveContainer width="100%" height={240}>
       <AreaChart
@@ -118,7 +120,7 @@ export function SpendingChart({ data }: SpendingChartProps) {
         <Area
           type="monotone"
           dataKey="income"
-          name="Income"
+          name={t.overview.income}
           stroke="hsl(155,50%,55%)"
           strokeWidth={2}
           fill="url(#grad-income)"
@@ -128,7 +130,7 @@ export function SpendingChart({ data }: SpendingChartProps) {
         <Area
           type="monotone"
           dataKey="expenses"
-          name="Expenses"
+          name={t.overview.expenses}
           stroke="hsl(0,65%,62%)"
           strokeWidth={2}
           fill="url(#grad-expenses)"
