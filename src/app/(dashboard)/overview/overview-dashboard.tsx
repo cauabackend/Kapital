@@ -57,7 +57,7 @@ function StatCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border bg-card p-5 transition-colors hover:border-border",
+        "relative overflow-hidden rounded-2xl border bg-card p-4 md:p-5 transition-colors hover:border-border",
         highlight ? "border-primary/30" : "border-border/50",
       )}
     >
@@ -71,7 +71,7 @@ function StatCard({
           </p>
           <p
             className={cn(
-              "truncate font-heading text-2xl font-semibold tracking-tight tabular-nums",
+              "font-heading text-xl md:text-2xl font-semibold tracking-tight tabular-nums",
               accent,
             )}
           >
@@ -79,7 +79,7 @@ function StatCard({
           </p>
           <p className="text-xs text-muted-foreground/60">{subtext}</p>
         </div>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/50">
+        <div className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/50">
           <Icon className="h-4 w-4 text-muted-foreground/70" strokeWidth={1.6} />
         </div>
       </div>
