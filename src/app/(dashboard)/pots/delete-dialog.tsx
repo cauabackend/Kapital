@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Pot } from "@/types/database";
+import { useT } from "@/hooks/use-t";
 
 interface DeleteDialogProps {
   pot: Pot;
@@ -17,6 +18,7 @@ export function DeleteDialog({
   onConfirm,
   onCancel,
 }: DeleteDialogProps) {
+  const t = useT();
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,11 +62,11 @@ export function DeleteDialog({
           </div>
 
           <h2 className="font-heading text-xl font-semibold tracking-tight">
-            Delete pot?
+            {t.pots.deleteTitle}
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{pot.name}</span> and
-            all its saved funds will be permanently removed.
+            <span className="font-medium text-foreground">{pot.name}</span>{" "}
+            {t.pots.deleteBody}
           </p>
 
           <div className="mt-6 flex gap-3">
@@ -73,14 +75,14 @@ export function DeleteDialog({
               disabled={isPending}
               className="flex-1 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground disabled:opacity-50"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               onClick={onConfirm}
               disabled={isPending}
               className="flex-1 rounded-xl bg-[hsl(var(--expense))] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
             >
-              {isPending ? "Deleting…" : "Delete"}
+              {isPending ? t.common.deleting : "Delete"}
             </button>
           </div>
         </div>

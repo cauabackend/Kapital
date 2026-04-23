@@ -17,6 +17,7 @@ import { RecurringBill } from "@/types/database";
 import { toggleBillPaid, deleteRecurringBill } from "./actions";
 import { BillModal } from "./bill-modal";
 import { DeleteDialog } from "./delete-dialog";
+import { useT } from "@/hooks/use-t";
 
 type SortKey = "due_day" | "name" | "amount";
 
@@ -47,6 +48,7 @@ function getBillStatus(bill: RecurringBill): "paid" | "overdue" | "upcoming" {
 }
 
 export function BillsClient({ bills }: BillsClientProps) {
+  const t = useT();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("due_day");
   const [sortAsc, setSortAsc] = useState(true);
@@ -141,10 +143,10 @@ export function BillsClient({ bills }: BillsClientProps) {
       <div className="flex items-end justify-between">
         <div className="space-y-1">
           <h1 className="font-heading text-3xl font-semibold tracking-tight">
-            Recurring Bills
+            {t.bills.title}
           </h1>
           <p className="text-muted-foreground">
-            Stay ahead of your monthly commitments
+            {t.bills.subtitle}
           </p>
         </div>
         <button
@@ -155,27 +157,27 @@ export function BillsClient({ bills }: BillsClientProps) {
           className="flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" strokeWidth={2.5} />
-          Add Bill
+          {t.bills.addBill}
         </button>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <SummaryCard
-          label="Monthly total"
+          label={t.bills.monthlyTotal}
           value={fmt(totalMonthly)}
           accent="border-primary/20"
           valueClass=""
         />
         <SummaryCard
-          label="Paid"
+          label={t.bills.paid}
           value={fmt(totalPaid)}
           accent="border-[hsl(var(--income)/0.25)]"
           valueClass="text-[hsl(var(--income))]"
           icon={<Check className="h-3.5 w-3.5" />}
         />
         <SummaryCard
-          label="Remaining"
+          label={t.bills.remaining}
           value={fmt(totalUpcoming)}
           accent="border-[hsl(var(--expense)/0.25)]"
           valueClass={totalUpcoming > 0 ? "text-[hsl(var(--expense))]" : ""}
@@ -194,7 +196,7 @@ export function BillsClient({ bills }: BillsClientProps) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search bills…"
+            placeholder={t.bills.search}
             className="h-10 w-full rounded-xl border border-border/50 bg-card pl-9 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/50"
           />
         </div>
@@ -208,25 +210,25 @@ export function BillsClient({ bills }: BillsClientProps) {
             onClick={() => cycleSort("due_day")}
             className="text-left text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
-            Day
+            {t.bills.day}
             <SortIcon k="due_day" />
           </button>
           <button
             onClick={() => cycleSort("name")}
             className="text-left text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
-            Bill
+            {t.bills.bill}
             <SortIcon k="name" />
           </button>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-            Status
+            {t.bills.status}
           </span>
           <button
             onClick={() => cycleSort("amount")}
             className="text-right text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
             <SortIcon k="amount" />
-            Amount
+            {t.bills.amount}
           </button>
           {/* Actions column — invisible header */}
           <span />
@@ -307,6 +309,7 @@ function BillRow({
   onEdit,
   onDelete,
 }: BillRowProps) {
+  const t = useT();
   const dayColors = {
     paid: "bg-[hsl(var(--income)/0.1)] text-[hsl(var(--income))]",
     overdue: "bg-[hsl(var(--expense)/0.1)] text-[hsl(var(--expense))]",
@@ -315,17 +318,17 @@ function BillRow({
 
   const statusConfig = {
     paid: {
-      label: "Paid",
+      label: t.bills.paid,
       icon: <Check className="h-3 w-3" strokeWidth={2.5} />,
       cls: "bg-[hsl(var(--income)/0.1)] text-[hsl(var(--income))] border-[hsl(var(--income)/0.2)]",
     },
     overdue: {
-      label: "Overdue",
+      label: t.bills.overdue,
       icon: <AlertCircle className="h-3 w-3" strokeWidth={2} />,
       cls: "bg-[hsl(var(--expense)/0.1)] text-[hsl(var(--expense))] border-[hsl(var(--expense)/0.2)]",
     },
     upcoming: {
-      label: "Upcoming",
+      label: t.bills.upcoming,
       icon: <Clock className="h-3 w-3" strokeWidth={2} />,
       cls: "bg-muted/50 text-muted-foreground border-border/40",
     },
@@ -448,6 +451,7 @@ function EmptyState({
   isFiltered: boolean;
   onAdd: () => void;
 }) {
+  const t = useT();
   return (
     <div className="flex h-[280px] flex-col items-center justify-center gap-4">
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/60">
@@ -458,12 +462,12 @@ function EmptyState({
       </div>
       <div className="text-center">
         <p className="font-heading text-lg font-medium text-muted-foreground/50">
-          {isFiltered ? "No bills match your search" : "No recurring bills"}
+          {isFiltered ? t.bills.noSearch : t.bills.empty}
         </p>
         <p className="mt-0.5 text-sm text-muted-foreground/35">
           {isFiltered
-            ? "Try a different search term"
-            : "Add your first recurring bill to track it here"}
+            ? t.bills.noSearchHint
+            : t.bills.emptyHint}
         </p>
       </div>
       {!isFiltered && (
@@ -471,7 +475,7 @@ function EmptyState({
           onClick={onAdd}
           className="mt-1 rounded-xl border border-border/50 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
         >
-          Add your first bill
+          {t.bills.addFirst}
         </button>
       )}
     </div>

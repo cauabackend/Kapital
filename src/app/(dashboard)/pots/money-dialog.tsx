@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { potTransactionSchema, PotTransactionFormData } from "@/lib/validators/pot";
 import { depositToPot, withdrawFromPot } from "./actions";
 import { Pot } from "@/types/database";
+import { useT } from "@/hooks/use-t";
 
 interface MoneyDialogProps {
   pot: Pot;
@@ -24,6 +25,7 @@ function fmt(n: number) {
 }
 
 export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
+  const t = useT();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
   const isDeposit = mode === "deposit";
@@ -130,7 +132,7 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
             </div>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                {isDeposit ? "Add money to" : "Withdraw from"}
+                {isDeposit ? t.pots.addMoneyTo : t.pots.withdrawFrom}
               </p>
               <h2 className="font-heading text-lg font-semibold leading-none tracking-tight">
                 {pot.name}
@@ -149,8 +151,8 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
           {/* Balance preview bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Current: {fmt(pot.current_amount)}</span>
-              <span>Target: {fmt(pot.target_amount)}</span>
+              <span>{t.pots.current}: {fmt(pot.current_amount)}</span>
+              <span>{t.pots.target}: {fmt(pot.target_amount)}</span>
             </div>
 
             {/* Track */}
@@ -176,7 +178,7 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
 
             <div className="text-right text-xs font-medium" style={{ color: pot.theme_color }}>
               {amountValue > 0
-                ? `After: ${fmt(preview)} (${previewPct.toFixed(0)}%)`
+                ? `${t.pots.after}: ${fmt(preview)} (${previewPct.toFixed(0)}%)`
                 : `${currentPct.toFixed(0)}% saved`}
             </div>
           </div>
@@ -188,7 +190,7 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
                 htmlFor="tx-amount"
                 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
               >
-                Amount
+                {t.bills.amount}
               </label>
               <button
                 type="button"
@@ -196,7 +198,7 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
                 className="text-[10px] font-semibold uppercase tracking-widest transition-colors"
                 style={{ color: pot.theme_color }}
               >
-                Max
+                {t.common.max}
               </button>
             </div>
             <div className="flex items-center border-b border-border/50 transition-colors focus-within:border-primary">
@@ -221,12 +223,12 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
           {/* Limit note */}
           {isDeposit && maxDeposit > 0 && (
             <p className="text-xs text-muted-foreground/60">
-              Up to {fmt(maxDeposit)} can be added to reach the target.
+              {t.pots.upTo} {fmt(maxDeposit)} {t.pots.canBeAdded}
             </p>
           )}
           {!isDeposit && maxWithdraw > 0 && (
             <p className="text-xs text-muted-foreground/60">
-              Balance available to withdraw: {fmt(maxWithdraw)}.
+              {t.pots.balanceAvailable}: {fmt(maxWithdraw)}.
             </p>
           )}
 
@@ -244,7 +246,7 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
               onClick={onClose}
               className="flex-1 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               type="submit"
@@ -256,10 +258,10 @@ export function MoneyDialog({ pot, mode, onClose }: MoneyDialogProps) {
               style={{ backgroundColor: pot.theme_color }}
             >
               {isPending
-                ? "Processing…"
+                ? t.common.processing
                 : isDeposit
-                  ? "Add Money"
-                  : "Withdraw"}
+                  ? t.pots.addMoney
+                  : t.pots.withdraw}
             </button>
           </div>
         </form>

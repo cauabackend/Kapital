@@ -11,6 +11,7 @@ import {
 } from "@/lib/validators/recurring-bill";
 import { createRecurringBill, updateRecurringBill } from "./actions";
 import { RecurringBill } from "@/types/database";
+import { useT } from "@/hooks/use-t";
 
 export const BILL_CATEGORIES = [
   "Housing",
@@ -34,6 +35,7 @@ interface BillModalProps {
 }
 
 export function BillModal({ open, bill, onClose }: BillModalProps) {
+  const t = useT();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
   const isEditing = !!bill;
@@ -128,13 +130,13 @@ export function BillModal({ open, bill, onClose }: BillModalProps) {
         <div className="flex items-center justify-between border-b border-border/40 px-6 py-5">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-              {isEditing ? "Editing" : "New"}
+              {isEditing ? t.common.editing : t.common.new}
             </p>
             <h2
               id="bill-modal-title"
               className="font-heading text-xl font-semibold leading-none tracking-tight"
             >
-              {isEditing ? bill.name : "Add Recurring Bill"}
+              {isEditing ? bill.name : t.bills.addBill}
             </h2>
           </div>
           <button
@@ -152,7 +154,7 @@ export function BillModal({ open, bill, onClose }: BillModalProps) {
               htmlFor="bill-name"
               className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
             >
-              Bill name
+              {t.bills.billName}
             </label>
             <div className="border-b border-border/50 transition-colors focus-within:border-primary">
               <input
@@ -177,7 +179,7 @@ export function BillModal({ open, bill, onClose }: BillModalProps) {
                 htmlFor="bill-amount"
                 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
               >
-                Monthly amount
+                {t.bills.monthlyAmount}
               </label>
               <div className="flex items-center border-b border-border/50 transition-colors focus-within:border-primary">
                 <span className="font-heading text-lg text-muted-foreground/60">
@@ -205,7 +207,7 @@ export function BillModal({ open, bill, onClose }: BillModalProps) {
                 htmlFor="bill-due-day"
                 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
               >
-                Due day
+                {t.bills.dueDay}
               </label>
               <div className="flex items-center border-b border-border/50 transition-colors focus-within:border-primary">
                 <input
@@ -235,7 +237,7 @@ export function BillModal({ open, bill, onClose }: BillModalProps) {
               htmlFor="bill-category"
               className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
             >
-              Category
+              {t.bills.category}
             </label>
             <div className="relative border-b border-border/50 transition-colors focus-within:border-primary">
               <select
@@ -284,7 +286,7 @@ export function BillModal({ open, bill, onClose }: BillModalProps) {
               onClick={onClose}
               className="flex-1 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               type="submit"
@@ -295,10 +297,10 @@ export function BillModal({ open, bill, onClose }: BillModalProps) {
               )}
             >
               {isPending
-                ? "Saving…"
+                ? t.common.saving
                 : isEditing
-                  ? "Save changes"
-                  : "Add bill"}
+                  ? t.common.save
+                  : t.bills.createBill}
             </button>
           </div>
         </form>

@@ -8,12 +8,14 @@ import { PotCard } from "./pot-card";
 import { PotModal } from "./pot-modal";
 import { MoneyDialog } from "./money-dialog";
 import { DeleteDialog } from "./delete-dialog";
+import { useT } from "@/hooks/use-t";
 
 interface PotsClientProps {
   pots: Pot[];
 }
 
 export function PotsClient({ pots }: PotsClientProps) {
+  const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPot, setEditingPot] = useState<Pot | null>(null);
   const [moneyTarget, setMoneyTarget] = useState<{
@@ -47,10 +49,10 @@ export function PotsClient({ pots }: PotsClientProps) {
       <div className="flex items-end justify-between">
         <div className="space-y-1">
           <h1 className="font-heading text-3xl font-semibold tracking-tight">
-            Pots
+            {t.pots.title}
           </h1>
           <p className="text-muted-foreground">
-            Save toward your goals, one pot at a time
+            {t.pots.subtitle}
           </p>
         </div>
         <button
@@ -58,7 +60,7 @@ export function PotsClient({ pots }: PotsClientProps) {
           className="flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" strokeWidth={2.5} />
-          Add Pot
+          {t.pots.addPot}
         </button>
       </div>
 
@@ -121,6 +123,7 @@ export function PotsClient({ pots }: PotsClientProps) {
 }
 
 function EmptyState({ onAdd }: { onAdd: () => void }) {
+  const t = useT();
   return (
     <button
       onClick={onAdd}
@@ -131,10 +134,10 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
       </div>
       <div className="text-center">
         <p className="font-heading text-lg font-medium text-muted-foreground/50">
-          No savings pots yet
+          {t.pots.empty}
         </p>
         <p className="mt-0.5 text-sm text-muted-foreground/35">
-          Create a pot and set a target to start saving
+          {t.pots.emptyHint}
         </p>
       </div>
     </button>

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BudgetWithData } from "./actions";
+import { useT } from "@/hooks/use-t";
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
   Housing: Home,
@@ -54,6 +55,7 @@ function fmtDate(dateStr: string) {
 }
 
 export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
+  const t = useT();
   const pct = budget.max_amount > 0
     ? Math.min((budget.spent / budget.max_amount) * 100, 100)
     : 0;
@@ -103,7 +105,7 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
             </div>
             <div>
               <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-                Budget
+                {t.budgets.budget}
               </p>
               <h3 className="font-heading text-lg font-semibold leading-none tracking-tight">
                 {budget.category}
@@ -136,7 +138,7 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
             <span className="font-heading text-2xl font-semibold tabular-nums">
               {fmt(budget.spent)}
             </span>
-            <span className="ml-1.5 text-sm text-muted-foreground">spent</span>
+            <span className="ml-1.5 text-sm text-muted-foreground">{t.budgets.spent}</span>
           </div>
           <span className="text-sm text-muted-foreground">
             of {fmt(budget.max_amount)}
@@ -171,8 +173,8 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
             )}
           >
             {isOver
-              ? `${fmt(budget.spent - budget.max_amount)} over limit`
-              : `${fmt(remaining)} remaining`}
+              ? `${fmt(budget.spent - budget.max_amount)} ${t.budgets.overLimit}`
+              : `${fmt(remaining)} ${t.budgets.remaining}`}
           </span>
           <span className="text-xs tabular-nums text-muted-foreground">
             {pct.toFixed(0)}%
@@ -183,7 +185,7 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
         {budget.transactions.length > 0 && (
           <div className="space-y-2.5 border-t border-border/40 pt-4">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-              Recent
+              {t.budgets.recent}
             </p>
             {budget.transactions.map((tx) => (
               <div

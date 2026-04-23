@@ -3,6 +3,7 @@
 import { Pencil, Trash2, Plus, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Pot } from "@/types/database";
+import { useT } from "@/hooks/use-t";
 
 interface PotCardProps {
   pot: Pot;
@@ -79,6 +80,7 @@ export function PotCard({
   onDeposit,
   onWithdraw,
 }: PotCardProps) {
+  const t = useT();
   const pct =
     pot.target_amount > 0
       ? (pot.current_amount / pot.target_amount) * 100
@@ -148,7 +150,7 @@ export function PotCard({
                 color: pot.theme_color,
               }}
             >
-              Goal reached
+              {t.pots.goalReached}
             </span>
           )}
         </div>
@@ -157,7 +159,7 @@ export function PotCard({
         <div className="mb-5 flex items-baseline justify-between border-y border-border/30 py-3">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-              Saved
+              {t.pots.saved}
             </p>
             <p className="font-heading text-xl font-semibold tabular-nums">
               {fmt(pot.current_amount)}
@@ -165,7 +167,7 @@ export function PotCard({
           </div>
           <div className="text-right">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
-              {isComplete ? "Target" : "Left"}
+              {isComplete ? t.pots.target : t.pots.left}
             </p>
             <p className="font-heading text-xl font-semibold tabular-nums text-muted-foreground">
               {isComplete ? fmt(pot.target_amount) : fmt(remaining)}
@@ -189,7 +191,7 @@ export function PotCard({
             }}
           >
             <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Add Money
+            {t.pots.addMoney}
           </button>
           <button
             onClick={() => onWithdraw(pot)}
@@ -197,7 +199,7 @@ export function PotCard({
             className="flex h-9 items-center justify-center gap-1.5 rounded-xl border border-border/50 text-xs font-semibold text-muted-foreground transition-all hover:border-border hover:text-foreground active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Minus className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Withdraw
+            {t.pots.withdraw}
           </button>
         </div>
       </div>

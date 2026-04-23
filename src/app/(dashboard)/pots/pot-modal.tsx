@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { potSchema, PotFormData } from "@/lib/validators/pot";
 import { createPot, updatePot } from "./actions";
 import { Pot } from "@/types/database";
+import { useT } from "@/hooks/use-t";
 
 export const POT_COLORS = [
   { label: "Amber",  value: "#D4A855" },
@@ -27,6 +28,7 @@ interface PotModalProps {
 }
 
 export function PotModal({ open, pot, onClose }: PotModalProps) {
+  const t = useT();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
   const isEditing = !!pot;
@@ -130,13 +132,13 @@ export function PotModal({ open, pot, onClose }: PotModalProps) {
         <div className="flex items-center justify-between border-b border-border/40 px-6 py-5">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-              {isEditing ? "Editing" : "New"}
+              {isEditing ? t.common.editing : t.common.new}
             </p>
             <h2
               id="pot-modal-title"
               className="font-heading text-xl font-semibold leading-none tracking-tight"
             >
-              {isEditing ? pot.name : "Create Pot"}
+              {isEditing ? pot.name : t.pots.addPot}
             </h2>
           </div>
           <button
@@ -154,7 +156,7 @@ export function PotModal({ open, pot, onClose }: PotModalProps) {
               htmlFor="pot-name"
               className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
             >
-              Pot name
+              {t.pots.potName}
             </label>
             <div className="border-b border-border/50 transition-colors focus-within:border-primary">
               <input
@@ -178,7 +180,7 @@ export function PotModal({ open, pot, onClose }: PotModalProps) {
               htmlFor="pot-target"
               className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
             >
-              Target amount
+              {t.pots.targetAmount}
             </label>
             <div className="flex items-center border-b border-border/50 transition-colors focus-within:border-primary">
               <span className="font-heading text-lg text-muted-foreground/60">
@@ -204,7 +206,7 @@ export function PotModal({ open, pot, onClose }: PotModalProps) {
           {/* Color picker */}
           <div className="space-y-3">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Colour theme
+              {t.pots.colourTheme}
             </p>
             <div className="flex flex-wrap gap-2.5">
               {POT_COLORS.map(({ label, value }) => (
@@ -258,7 +260,7 @@ export function PotModal({ open, pot, onClose }: PotModalProps) {
               onClick={onClose}
               className="flex-1 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               type="submit"
@@ -267,10 +269,10 @@ export function PotModal({ open, pot, onClose }: PotModalProps) {
               style={{ backgroundColor: selectedColor }}
             >
               {isPending
-                ? "Saving…"
+                ? t.common.saving
                 : isEditing
-                  ? "Save changes"
-                  : "Create pot"}
+                  ? t.common.save
+                  : t.pots.createPot}
             </button>
           </div>
         </form>

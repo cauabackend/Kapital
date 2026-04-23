@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { budgetSchema, BudgetFormData } from "@/lib/validators/budget";
 import { createBudget, updateBudget, BudgetWithData } from "./actions";
+import { useT } from "@/hooks/use-t";
 
 interface BudgetModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ export function BudgetModal({
   availableCategories,
   onClose,
 }: BudgetModalProps) {
+  const t = useT();
   const overlayRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
   const isEditing = !!budget;
@@ -110,13 +112,13 @@ export function BudgetModal({
         <div className="flex items-center justify-between border-b border-border/40 px-6 py-5">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-              {isEditing ? "Editing" : "New"}
+              {isEditing ? t.common.editing : t.common.new}
             </p>
             <h2
               id="budget-modal-title"
               className="font-heading text-xl font-semibold leading-none tracking-tight"
             >
-              {isEditing ? budget.category : "Create Budget"}
+              {isEditing ? budget.category : t.budgets.addBudget}
             </h2>
           </div>
           <button
@@ -132,7 +134,7 @@ export function BudgetModal({
           {/* Category */}
           <div className="space-y-2">
             <label className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Category
+              {t.budgets.category}
             </label>
             {isEditing ? (
               <div className="border-b border-border/50 pb-2">
@@ -152,7 +154,7 @@ export function BudgetModal({
                   )}
                 >
                   {availableCategories.length === 0 ? (
-                    <option value="">All categories in use</option>
+                    <option value="">{t.budgets.allUsed}</option>
                   ) : (
                     availableCategories.map((cat) => (
                       <option key={cat} value={cat} className="bg-card">
@@ -190,7 +192,7 @@ export function BudgetModal({
               htmlFor="max_amount"
               className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
             >
-              Monthly limit
+              {t.budgets.monthlyLimit}
             </label>
             <div className="relative flex items-center border-b border-border/50 pb-0 transition-colors focus-within:border-primary">
               <span className="font-heading text-lg text-muted-foreground/60">
@@ -227,7 +229,7 @@ export function BudgetModal({
               onClick={onClose}
               className="flex-1 rounded-xl border border-border/50 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border hover:text-foreground"
             >
-              Cancel
+              {t.common.cancel}
             </button>
             <button
               type="submit"
@@ -239,10 +241,10 @@ export function BudgetModal({
               )}
             >
               {isPending
-                ? "Saving…"
+                ? t.common.saving
                 : isEditing
-                  ? "Save changes"
-                  : "Create budget"}
+                  ? t.common.save
+                  : t.budgets.createBudget}
             </button>
           </div>
         </form>

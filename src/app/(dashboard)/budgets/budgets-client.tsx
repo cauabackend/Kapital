@@ -6,6 +6,7 @@ import { BudgetWithData, deleteBudget } from "./actions";
 import { BudgetCard } from "./budget-card";
 import { BudgetModal } from "./budget-modal";
 import { DeleteDialog } from "./delete-dialog";
+import { useT } from "@/hooks/use-t";
 
 interface BudgetsClientProps {
   budgets: BudgetWithData[];
@@ -16,6 +17,7 @@ export function BudgetsClient({
   budgets,
   availableCategories,
 }: BudgetsClientProps) {
+  const t = useT();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<BudgetWithData | null>(
     null,
@@ -59,9 +61,9 @@ export function BudgetsClient({
       <div className="flex items-end justify-between">
         <div className="space-y-1">
           <h1 className="font-heading text-3xl font-semibold tracking-tight">
-            Budgets
+            {t.budgets.title}
           </h1>
-          <p className="text-muted-foreground">Set limits and stay on track</p>
+          <p className="text-muted-foreground">{t.budgets.subtitle}</p>
         </div>
 
         <button
@@ -70,7 +72,7 @@ export function BudgetsClient({
           className="flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-primary-foreground transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Plus className="h-4 w-4" strokeWidth={2.5} />
-          Add Budget
+          {t.budgets.addBudget}
         </button>
       </div>
 
@@ -99,7 +101,7 @@ export function BudgetsClient({
       {/* All categories used — hint */}
       {budgets.length > 0 && availableCategories.length === 0 && (
         <p className="text-center text-sm text-muted-foreground/50">
-          All available categories have a budget assigned.
+          {t.budgets.allUsed}
         </p>
       )}
 
@@ -131,6 +133,7 @@ function EmptyState({
   onAdd: () => void;
   hasCategories: boolean;
 }) {
+  const t = useT();
   return (
     <button
       onClick={hasCategories ? onAdd : undefined}
@@ -145,10 +148,10 @@ function EmptyState({
       </div>
       <div className="text-center">
         <p className="font-heading text-lg font-medium text-muted-foreground/50">
-          No budgets yet
+          {t.budgets.empty}
         </p>
         <p className="mt-0.5 text-sm text-muted-foreground/35">
-          Create a budget to start tracking spending by category
+          {t.budgets.emptyHint}
         </p>
       </div>
     </button>
